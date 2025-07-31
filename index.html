@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital E-Card</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #c2e9fb, #f9f9f9);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      #avatarPreview {
+        width: 80px;
+        height: 80px;
+        border-radius: 9999px;
+        object-fit: cover;
+      }
+      #dashboardImagePreview {
+        width: 100%;
+        height: auto;
+        border-radius: 1rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+      }
+      .social-icons a {
+        margin-right: 0.5rem;
+        font-size: 24px;
+        color: #333;
+        transition: transform 0.2s ease, color 0.2s ease;
+      }
+      .social-icons a:hover {
+        opacity: 0.8;
+      }
+
+      #namePreview {
+        font-family: 'Georgia', serif;
+        color: #333;
+      }
+
+      #jobPreview, #companyPreview {
+        font-family: 'Arial', sans-serif;
+        color: #555;
+      }
+
+      #popupEcardContent .flex-grow > div {
+        text-align: left;
+      }
+
+      #popupEcardContent #qrCodeDisplay canvas {
+        width: 150px !important;
+        height: 150px !important;
+      }
+
+      #popupPreview #popupEcardContent .p-4 {
+        text-align: left; /* Ensure text within the card is left-aligned */
+      }
+
+      #popupEcardContent .flex-grow > div {
+        text-align: left;
+      }
+
+      #popupEcardContent #qrCodeDisplay canvas {
+        width: 150px !important;
+        height: 150px !important;
+      }
+    </style>
+  </head>
+  <body class="p-6">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold">Digital E-Card</h2>
+        <p class="text-gray-600">Create your personal business card</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <form id="ecardForm" class="grid gap-4">
+          <div class="grid grid-cols-2 gap-4">
+            <input type="text" name="firstName" placeholder="First Name" class="form-control" required />
+            <input type="text" name="lastName" placeholder="Last Name" class="form-control" required />
+          </div>
+
+          <input type="file" name="avatar" id="avatarInput" accept="image/*" class="form-control" />
+          <input type="text" name="company" placeholder="Company" class="form-control" />
+          <input type="text" name="jobTitle" placeholder="Job Title" class="form-control" />
+          <input type="email" name="email" placeholder="Email" class="form-control" required />
+          <input type="tel" name="phone" placeholder="Phone" class="form-control" required />
+          <input type="text" name="address" placeholder="Address" class="form-control" />
+          <input type="date" name="birthday" class="form-control" />
+          <input type="url" name="website" placeholder="Website URL" class="form-control" />
+
+          <textarea name="notes" placeholder="Notes" class="form-control"></textarea>
+
+          <div class="grid grid-cols-2 gap-2">
+            <input type="url" name="facebook" placeholder="Facebook URL" class="form-control" />
+            <input type="url" name="whatsapp" placeholder="WhatsApp URL" class_="form-control" />
+            <input type="url" name="youtube" placeholder="YouTube URL" class="form-control" />
+            <input type="url" name="instagram" placeholder="Instagram URL" class="form-control" />
+            <input type="url" name="spacex" placeholder="SpaceX URL" class="form-control" />
+            <input type="url" name="twitter" placeholder="Twitter/X URL" class="form-control" />
+            <input type="url" name="linkedin" placeholder="LinkedIn URL" class="form-control" />
+          </div>
+
+          <button type="submit" class="btn btn-dark mt-4">Generate E-Card</button>
+        </form>
+
+        <div id="ecardPreview" class="mt-6">
+          <div class="p-4 rounded-lg shadow bg-gradient-to-r from-orange-300 to-pink-300 flex gap-4 items-center">
+            <div class="flex-grow"> <!-- This div will contain all text content -->
+              <div class="flex items-center gap-4">
+                <img id="avatarPreview" class="hidden w-20 h-20 rounded-full object-cover" alt="Avatar Preview">
+                <div>
+                  <h3 class="text-xl font-bold" id="namePreview"></h3>
+                  <p id="jobPreview" class="text-sm"></p>
+                  <p id="companyPreview" class="text-sm text-gray-700"></p>
+                </div>
+              </div>
+              <div class="mt-2">
+                <p id="contactPreview"></p>
+                <p id="websitePreview"></p>
+                <p id="addressPreview"></p>
+                <p id="notesPreview" class="text-sm italic mt-2"></p>
+                <div class="social-icons mt-2" id="socialLinks"></div>
+              </div>
+            </div>
+            <div id="qrCodeDisplay" class="p-2 border-4 border-white rounded-lg shadow-md hidden"></div> <!-- QR code display area -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="popupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div id="popupContent" class="bg-white rounded-2xl shadow-xl p-8 max-w-4xl w-full relative">
+        <button id="closePopup" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+        <div id="popupPreview" class="text-center">
+        </div>
+        <div id="popupPreview" class="text-center">
+        </div>
+        <div class="mt-4 flex gap-4 items-center justify-center">
+            <button id="saveToContacts" class="btn btn-dark">Save to Contacts</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+    <script>
+      const form = document.getElementById('ecardForm');
+      const preview = document.getElementById('ecardPreview');
+      const qrCodeContainer = document.getElementById('qrCodeContainer');
+      const avatarInput = document.getElementById('avatarInput');
+      const avatarPreview = document.getElementById('avatarPreview');
+      const socialLinks = document.getElementById('socialLinks');
+      let qrLink = '';
+
+      const socialIcons = {
+        facebook: 'ph-facebook-logo',
+        whatsapp: 'ph-whatsapp-logo',
+        youtube: 'ph-youtube-logo',
+        instagram: 'ph-instagram-logo',
+        spacex: 'ph-rocket',
+        twitter: 'ph-twitter-logo',
+        linkedin: 'ph-linkedin-logo'
+      };
+
+      function updatePreview() {
+        const data = new FormData(form);
+        const fullName = `${data.get('firstName') || ''} ${data.get('lastName') || ''}`;
+
+        document.getElementById('namePreview').innerText = fullName.trim() ? fullName : 'John Doe';
+        document.getElementById('jobPreview').innerText = data.get('jobTitle') || 'Job Title';
+        document.getElementById('companyPreview').innerText = data.get('company') || 'Company';
+        document.getElementById('contactPreview').innerHTML = `📧 ${data.get('email') || ''}<br>📞 ${data.get('phone') || ''}`;
+        document.getElementById('websitePreview').innerText = `🌐 ${data.get('website') || ''}`;
+        document.getElementById('addressPreview').innerText = `🏠 ${data.get('address') || ''}`;
+        document.getElementById('notesPreview').innerText = data.get('notes') ? `📝 ${data.get('notes')}` : '';
+
+        if (avatarInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            avatarPreview.src = reader.result;
+            avatarPreview.classList.remove('hidden');
+          };
+          reader.readAsDataURL(avatarInput.files[0]);
+        } else {
+            avatarPreview.classList.add('hidden');
+        }
+
+        socialLinks.innerHTML = '';
+        Object.keys(socialIcons).forEach(key => {
+          const url = data.get(key);
+          if (url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.setAttribute('title', key.charAt(0).toUpperCase() + key.slice(1));
+            a.innerHTML = `<i class="ph ${socialIcons[key]}"></i>`;
+            a.style.color = getSocialIconColor(key);
+            socialLinks.appendChild(a);
+          }
+        });
+        preview.classList.remove('hidden');
+      }
+
+      function getSocialIconColor(key) {
+        const colors = {
+            facebook: '#1877F2',
+            whatsapp: '#25D366',
+            youtube: '#FF0000',
+            instagram: '#E4405F',
+            spacex: '#000000',
+            twitter: '#1DA1F2',
+            linkedin: '#0A66C2'
+        };
+        return colors[key] || '#333';
+      }
+
+      form.addEventListener('input', updatePreview);
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        generateEcard();
+      });
+
+      function generateEcard() {
+        updatePreview(); // Ensure preview is up to date before generating vCard and QR
+
+        const data = new FormData(form);
+        const fullName = `${data.get('firstName') || 'Ehasan'} ${data.get('lastName') || 'Haque'}`;
+        const jobTitle = data.get('jobTitle') || 'Junior Executive Dupno';
+
+        // Clone the ecardPreview content
+        const clonedEcard = document.getElementById('ecardPreview').cloneNode(true);
+        clonedEcard.id = 'popupEcardContent'; // Give it a new ID to avoid conflicts
+        clonedEcard.classList.remove('mt-6'); // Remove margin from the cloned content
+
+        // Find the QR code container within the cloned content
+        const qrCodeContainer = clonedEcard.querySelector('#qrCodeDisplay');
+        qrCodeContainer.innerHTML = ''; // Clear any existing content
+        qrCodeContainer.classList.remove('hidden'); // Make it visible
+
+        const gFormUrl = new URL('https://contacts.google.com/new');
+        gFormUrl.searchParams.set('fn', data.get('firstName'));
+        gFormUrl.searchParams.set('ln', data.get('lastName'));
+        gFormUrl.searchParams.set('email', data.get('email'));
+        gFormUrl.searchParams.set('phone', data.get('phone'));
+        gFormUrl.searchParams.set('address', data.get('address'));
+        gFormUrl.searchParams.set('company', data.get('company'));
+        gFormUrl.searchParams.set('jobTitle', data.get('jobTitle'));
+
+        qrLink = gFormUrl.href;
+        new QRCode(qrCodeContainer, {
+            text: qrLink,
+            width: 100,
+            height: 100,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        // Set the popup content
+        const popupPreview = document.getElementById('popupPreview');
+        popupPreview.innerHTML = ''; // Clear previous content
+        popupPreview.appendChild(clonedEcard);
+
+        document.getElementById('popupModal').classList.remove('hidden');
+
+        const vcard = `BEGIN:VCARD\nVERSION:3.0\nN:${data.get('lastName')};${data.get('firstName')}\nFN:${fullName}\nORG:${data.get('company')}\nTITLE:${jobTitle}\nTEL;TYPE=work,voice:${data.get('phone')}\nEMAIL:${data.get('email')}\nADR:${data.get('address')}\nURL:${data.get('website')}\nBDAY:${data.get('birthday')}\nNOTE:${data.get('notes')}\nEND:VCARD`;
+
+        document.getElementById('saveToContacts').onclick = function () {
+          const blob = new Blob([vcard.replace(/\\n/g, '\n')], { type: 'text/vcard' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${data.get('firstName') || 'contact'}.vcf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+      }
+
+      document.getElementById('closePopup').onclick = () => {
+        document.getElementById('popupModal').classList.add('hidden');
+      };
+    </script>
+  </body>
+</html>
