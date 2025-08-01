@@ -45,26 +45,35 @@
         color: #555;
       }
 
-      #popupEcardContent .flex-grow > div {
-        text-align: left;
+      #popupEcardContent .p-4 {
+        flex-direction: column; /* Stack elements vertically on small screens */
+        align-items: center; /* Center items when stacked */
       }
 
-      #popupEcardContent #qrCodeDisplay canvas {
-        width: 150px !important;
-        height: 150px !important;
+      #popupEcardContent .flex-grow > div > * {
+        text-align: left; /* Ensure all direct children of the inner div are left-aligned */
       }
 
-      #popupPreview #popupEcardContent .p-4 {
-        text-align: left; /* Ensure text within the card is left-aligned */
+      #popupEcardContent #qrCodeDisplay {
+        margin-top: 1rem; /* Add some space above QR code on small screens */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add a subtle shadow */
+        border-radius: 8px; /* Slightly rounded corners */
       }
 
-      #popupEcardContent .flex-grow > div {
-        text-align: left;
-      }
+      @media (min-width: 768px) { /* Medium devices and up */
+        #popupEcardContent .p-4 {
+          flex-direction: row; /* Row layout on larger screens */
+          text-align: left; /* Left align text on larger screens */
+        }
 
-      #popupEcardContent #qrCodeDisplay canvas {
-        width: 150px !important;
-        height: 150px !important;
+        #popupEcardContent .flex-grow {
+          width: auto; /* Auto width on larger screens */
+        }
+
+        #popupEcardContent #qrCodeDisplay {
+          margin-top: 0; /* Remove top margin on larger screens */
+          margin-left: auto; /* Push QR code to the right */
+        }
       }
     </style>
   </head>
@@ -131,12 +140,10 @@
       </div>
     </div>
 
-    <div id="popupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-      <div id="popupContent" class="bg-white rounded-2xl shadow-xl p-8 max-w-4xl w-full relative">
-        <button id="closePopup" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-        <div id="popupPreview" class="text-center">
-        </div>
-        <div id="popupPreview" class="text-center">
+    <div id="popupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+      <div id="popupContent" class="bg-white rounded-2xl shadow-xl p-4 w-full max-w-md md:max-w-lg lg:max-w-xl relative">
+        <button id="closePopup" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+        <div id="popupPreview" class="text-left">
         </div>
         <div class="mt-4 flex gap-4 items-center justify-center">
             <button id="saveToContacts" class="btn btn-dark">Save to Contacts</button>
@@ -250,6 +257,7 @@
         gFormUrl.searchParams.set('jobTitle', data.get('jobTitle'));
 
         qrLink = gFormUrl.href;
+        console.log("QR Code Link:", qrLink); // Debugging line
         new QRCode(qrCodeContainer, {
             text: qrLink,
             width: 100,
