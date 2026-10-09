@@ -1,3 +1,11 @@
+<!-- banner -->
+<p align="center"><img src=".github/assets/banner.png" alt="Digital E-Card" width="100%"></p>
+
+<p align="center"><a href="#features">Features</a> · <a href="#setup-and-usage">Run it</a></p>
+
+<p align="center"><img src=".github/assets/screenshot.png" alt="Digital E-Card builder" width="90%"></p>
+<!-- /banner -->
+
 # Digital Business Card Dashboard
 
 This project is a responsive web-based digital business card dashboard that allows users to create and customize their personal or professional digital business cards. It features a live preview, vCard download functionality, and a dynamic QR code generator for easy sharing.
